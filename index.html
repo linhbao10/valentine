@@ -1,0 +1,794 @@
+ <!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gửi pun iu của pin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Montserrat:wght@300;400;600;800&family=Dancing+Script:wght@700&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+<style>
+:root {
+--deep-burgundy: #7c131a;
+--vintage-cream: #f4e8d1;
+--antique-gold: #cba16e;
+--rich-brown: #3e2723;
+--paper-texture: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+}
+body { margin: 0; padding: 0; background-color: var(--vintage-cream); font-family: 'Montserrat', sans-serif; color: var(--rich-brown); overflow-x: hidden; min-height: 100vh; position: relative; user-select: none; }
+.bg-pattern-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; overflow: hidden; opacity: 0.08; pointer-events: none; background-image: var(--paper-texture); }
+.scrolling-text { font-family: 'Nanum Pen Script', cursive; font-size: 2.5rem; color: var(--deep-burgundy); white-space: nowrap; animation: drift 80s linear infinite alternate; transform: rotate(-8deg) scale(1.1); }
+@keyframes drift { from { transform: rotate(-8deg) translateY(0); } to { transform: rotate(-8deg) translateY(-80px); } }
+
+/* --- MÀN HÌNH INTRO SANG TRỌNG --- */
+#intro-screen {
+position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+/* Nền đỏ nhung tối sang trọng */
+background: radial-gradient(circle, #750000, #2b0000);
+z-index: 5000; display: flex; flex-direction: column; justify-content: center; align-items: center;
+transition: opacity 3s ease, visibility 3s; /* Tan biến chậm 3s */
+}
+#intro-screen.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+
+/* ĐĨA NHẠC (BUTTON) */
+.vinyl-container {
+width: 350px; height: 350px; /* To rõ ràng */
+position: relative; cursor: pointer;
+border-radius: 50%;
+/* Bóng đổ sâu */
+box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 40px rgba(203, 161, 110, 0.2);
+transition: transform 0.3s;
+}
+.vinyl-container:hover { transform: scale(1.02); }
+
+/* Hiệu ứng xoay 1 vòng khi bấm */
+.vinyl-container.spinning {
+animation: spinOnce 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes spinOnce { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.vinyl-disk {
+width: 100%; height: 100%; border-radius: 50%;
+/* Màu đĩa than đen bóng */
+background: conic-gradient(from 90deg, #111, #333, #111, #333, #111);
+position: absolute; top: 0; left: 0;
+display: flex; justify-content: center; align-items: center;
+border: 6px solid rgba(255,255,255,0.1);
+}
+/* Vân rãnh đĩa */
+.vinyl-disk::before {
+content: ''; position: absolute; width: 95%; height: 95%; border-radius: 50%;
+background: repeating-radial-gradient(#111 0, #111 2px, #222 3px, #111 4px);
+opacity: 0.6;
+}
+
+/* KHU VỰC CHỨA ẢNH BÌA */
+.vinyl-cover-art-container {
+width: 60%; height: 60%; border-radius: 50%; overflow: hidden;
+border: 5px solid var(--antique-gold); position: relative; z-index: 2;
+background: #000;
+}
+/* Ảnh bìa mờ ảo */
+.vinyl-cover-art {
+width: 100%; height: 100%; object-fit: cover;
+filter: contrast(1.2);
+transform: scale(1.1); pointer-events: none;
+}
+
+/* Chữ hướng dẫn (Font Dancing Script) */
+.click-hint {
+margin-top: 60px;
+font-family: 'Montserrat', sans-serif;
+font-style: italic; font-weight: 500;
+font-size: 2.5rem; color: var(--antique-gold);
+letter-spacing: 2px;
+text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+animation: pulseText 2s infinite; pointer-events: none;
+}
+@keyframes pulseText { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+
+/* --- NỘI DUNG CHÍNH --- */
+.main-wrapper { position: relative; max-width: 1100px; margin: 50px auto; opacity: 0; transform: translateY(100px); transition: all 3s ease-out; }
+.paper-layer-back { position: absolute; top: 25px; left: 25px; right: -25px; bottom: -25px; background: #f2ebd4; border: 1px solid var(--antique-gold); box-shadow: 0 20px 50px rgba(0,0,0,0.15); transform: rotate(2deg); z-index: 0; }
+.container { position: relative; background: #fff; background-image: var(--paper-texture); border: 4px double var(--antique-gold); padding: 50px; box-shadow: 0 15px 35px rgba(124, 19, 26, 0.1); z-index: 1; }
+.header-section { text-align: center; margin-bottom: 30px; }
+.header-section h1 { font-size: 3.5rem; margin-bottom: 10px; }
+.music-player-vintage { display: inline-flex; align-items: center; gap: 20px; background: url('Image.jpeg') center/cover no-repeat; border: 2px solid var(--antique-gold); padding: 12px 30px; border-radius: 50px; margin-top: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); position: relative; overflow: hidden; }
+.music-player-vintage::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.4); z-index: 0; }
+.music-player-vintage > * { position: relative; z-index: 1; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* HEART GRID TO & RÕ */
+.heart-grid-container {
+display: grid;
+grid-template-columns: repeat(7, 70px); grid-template-rows: repeat(6, 70px);
+gap: 10px; margin: 50px auto; justify-content: center;
+animation: floatMove 4s ease-in-out infinite alternate;
+}
+@keyframes floatMove { 0% { transform: translate(0, 0); } 100% { transform: translate(0, -5px); } }
+.love-thumb { width: 100%; height: 100%; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(74, 10, 18, 0.3); border: 3px solid var(--vintage-cream); cursor: default; transition: 0.3s; animation: floatMove 4s ease-in-out infinite alternate; }
+.love-thumb:nth-child(odd) { animation-duration: 5s; animation-delay: 0.5s; }
+.love-thumb:hover { transform: scale(1.3) !important; z-index: 100; border-color: var(--antique-gold); }
+.love-thumb img { width: 100%; height: 100%; object-fit: cover; filter: sepia(20%) contrast(110%); }
+
+.love-thumb.has-letter { cursor: pointer; border-color: var(--deep-burgundy); animation: pulse-letter 2s infinite !important; }
+@keyframes pulse-letter { 0% { border-color: var(--deep-burgundy); transform: scale(1); } 50% { border-color: var(--antique-gold); transform: scale(1.05); } 100% { border-color: var(--deep-burgundy); transform: scale(1); } }
+.love-thumb.has-letter:hover::after { content: '💌'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2.5rem; }
+
+.pos-1-2 { grid-column: 2; grid-row: 1; } .pos-1-3 { grid-column: 3; grid-row: 1; } .pos-1-5 { grid-column: 5; grid-row: 1; } .pos-1-6 { grid-column: 6; grid-row: 1; }
+.pos-2-1 { grid-column: 1; grid-row: 2; } .pos-2-2 { grid-column: 2; grid-row: 2; } .pos-2-3 { grid-column: 3; grid-row: 2; } .pos-2-4 { grid-column: 4; grid-row: 2; } .pos-2-5 { grid-column: 5; grid-row: 2; } .pos-2-6 { grid-column: 6; grid-row: 2; } .pos-2-7 { grid-column: 7; grid-row: 2; }
+.pos-3-1 { grid-column: 1; grid-row: 3; } .pos-3-2 { grid-column: 2; grid-row: 3; } .pos-3-3 { grid-column: 3; grid-row: 3; } .pos-3-4 { grid-column: 4; grid-row: 3; } .pos-3-5 { grid-column: 5; grid-row: 3; } .pos-3-6 { grid-column: 6; grid-row: 3; } .pos-3-7 { grid-column: 7; grid-row: 3; }
+.pos-4-2 { grid-column: 2; grid-row: 4; } .pos-4-3 { grid-column: 3; grid-row: 4; } .pos-4-4 { grid-column: 4; grid-row: 4; } .pos-4-5 { grid-column: 5; grid-row: 4; } .pos-4-6 { grid-column: 6; grid-row: 4; }
+.pos-5-3 { grid-column: 3; grid-row: 5; } .pos-5-4 { grid-column: 4; grid-row: 5; } .pos-5-5 { grid-column: 5; grid-row: 5; }
+.pos-6-4 { grid-column: 4; grid-row: 6; }
+
+.secret-locket { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--antique-gold); border-radius: 50%; border: 3px solid var(--deep-burgundy); box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; z-index: 900; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; transition: transform 0.3s; }
+.locket-message { position: fixed; bottom: 100px; right: 30px; background: #fffcf5; padding: 20px; border: 2px solid var(--antique-gold); max-width: 250px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-radius: 10px 10px 0 10px; opacity: 0; visibility: hidden; transform: translateY(20px); transition: all 0.4s ease; z-index: 900; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 1rem; color: var(--deep-burgundy); }
+.locket-message.show { opacity: 1; visibility: visible; transform: translateY(0); }
+.letter-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(74, 10, 18, 0.95); z-index: 4000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; background-image: var(--paper-texture); }
+.letter-modal.active { opacity: 1; pointer-events: auto; }
+.letter-content { background: var(--vintage-cream); width: 80%; max-width: 650px; padding: 60px; position: relative; box-shadow: 0 50px 100px rgba(0,0,0,0.6); transform: perspective(1000px) rotateX(10deg) translateY(100px); transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); background-image: url("https://www.transparenttextures.com/patterns/old-paper-fibers.png"); border: 4px solid var(--antique-gold); outline: 2px dashed var(--deep-burgundy); outline-offset: -15px; }
+.letter-modal.active .letter-content { transform: perspective(1000px) rotateX(0deg) translateY(0); }
+.close-letter { position: absolute; top: 20px; right: 30px; font-size: 2.5rem; cursor: pointer; color: var(--deep-burgundy); }
+.letter-text { font-size: 1.2rem; line-height: 1.8; white-space: pre-line; font-weight: 400; }
+.washi-tape { position: absolute; height: 40px; width: 130px; background-color: var(--deep-burgundy); opacity: 0.8; background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(212, 175, 55, 0.2) 10px, rgba(212, 175, 55, 0.2) 20px); box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
+.tape-1 { top: -20px; left: 15%; transform: rotate(-4deg); } .tape-2 { bottom: -20px; right: 15%; transform: rotate(3deg); }
+.counter-tag { position: absolute; top: -50px; right: -20px; background: var(--deep-burgundy); color: var(--vintage-cream); padding: 20px; width: 200px; text-align: center; box-shadow: 5px 5px 15px rgba(0,0,0,0.4); transform: rotate(5deg); border: 3px dotted var(--antique-gold); z-index: 20; transition: all 0.5s ease; }
+.quiz-input { width: 90%; padding: 8px; margin: 8px 0; background: var(--vintage-cream); border: none; font-family: 'Montserrat'; font-weight: bold; text-align: center; color: var(--deep-burgundy); font-size: 0.9rem; }
+.quiz-btn { background: var(--antique-gold); border: none; padding: 5px 15px; cursor: pointer; font-family: 'Cinzel Decorative'; font-size: 0.8rem; color: var(--deep-burgundy); }
+.error-msg { color: #ff6b6b; font-family: 'Nanum Pen Script'; font-size: 1.5rem; display: none; margin-top: 5px; animation: shake 0.5s; }
+@keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } 100% { transform: translateX(0); } }
+.counter-content { display: none; } .counter-content span { display: block; font-size: 2.5rem; font-family: 'Cinzel Decorative'; }
+.audio-section { text-align: center; margin-top: 80px; padding: 40px; background: rgba(74, 10, 18, 0.05); border-radius: 20px; border: 2px dashed var(--antique-gold); }
+.local-audio { width: 90%; margin-top: 20px; filter: sepia(30%) hue-rotate(-10deg); }
+#youtube-player { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; z-index: -1; }
+
+/* ===== MINION BOB MAZE GAME ===== */
+#game-screen {
+position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+background: linear-gradient(135deg, #0a1f0a 0%, #0f2b0f 50%, #142814 100%);
+z-index: 6000;
+display: flex; flex-direction: column;
+justify-content: center; align-items: center;
+transition: opacity 2s ease, visibility 2s;
+overflow: hidden;
+}
+#game-screen.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+#game-screen .stars { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; }
+#game-screen .star {
+position: absolute; width: 3px; height: 3px; background: #fff; border-radius: 50%;
+animation: twinkle 2s ease-in-out infinite alternate;
+}
+@keyframes twinkle { 0% { opacity: 0.2; } 100% { opacity: 1; } }
+.game-title {
+font-family: 'Dancing Script', cursive;
+font-size: 1.8rem; color: #FFD93D;
+text-shadow: 0 0 20px rgba(255,217,61,0.5);
+margin-bottom: 8px; text-align: center; padding: 0 20px;
+animation: gameTitle 2s ease-in-out infinite alternate;
+}
+@keyframes gameTitle { 0% { transform: translateY(0); } 100% { transform: translateY(-4px); } }
+.game-subtitle {
+font-family: 'Montserrat', sans-serif;
+font-size: 0.85rem; color: rgba(255,255,255,0.55);
+margin-bottom: 12px; text-align: center;
+}
+#maze-canvas {
+border: 3px solid rgba(255,217,61,0.5);
+border-radius: 10px;
+box-shadow: 0 0 40px rgba(255,217,61,0.12), inset 0 0 20px rgba(0,0,0,0.3);
+}
+.game-controls {
+display: flex; flex-direction: column; align-items: center;
+margin-top: 10px; gap: 4px;
+}
+.game-controls .ctrl-row { display: flex; gap: 4px; }
+.ctrl-btn {
+width: 52px; height: 52px;
+background: rgba(255,217,61,0.12);
+border: 2px solid rgba(255,217,61,0.4);
+border-radius: 12px; color: #FFD93D;
+font-size: 1.3rem; cursor: pointer;
+transition: all 0.15s;
+-webkit-tap-highlight-color: transparent;
+user-select: none;
+}
+.ctrl-btn:active { background: rgba(255,217,61,0.35); transform: scale(0.9); }
+.game-hint {
+font-family: 'Montserrat', sans-serif;
+font-size: 0.7rem; color: rgba(255,255,255,0.3);
+margin-top: 8px;
+}
+#win-overlay {
+position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(10,10,42,0.88);
+display: none; flex-direction: column;
+justify-content: center; align-items: center;
+z-index: 10;
+}
+#win-overlay .win-text {
+font-family: 'Dancing Script', cursive;
+font-size: 2.8rem; color: #FFD93D;
+text-shadow: 0 0 30px rgba(255,217,61,0.7);
+animation: winBounce 0.6s ease;
+}
+@keyframes winBounce { 0% { transform: scale(0); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } }
+#win-overlay .win-sub {
+font-family: 'Montserrat', sans-serif;
+font-size: 1rem; color: rgba(255,255,255,0.7);
+margin-top: 10px;
+}
+#win-overlay .win-hearts {
+font-size: 2rem; margin-top: 8px;
+animation: winFloat 1s ease-in-out infinite alternate;
+}
+@keyframes winFloat { 0% { transform: translateY(0); } 100% { transform: translateY(-8px); } }
+@keyframes mazeHeartFloat {
+0% { transform: translateY(0) scale(1); opacity: 1; }
+100% { transform: translateY(-100vh) scale(0.5) rotate(360deg); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== MINION BOB MAZE GAME ===== -->
+<div id="game-screen">
+<div class="stars" id="stars-container"></div>
+<div class="game-title">pun thực hiện thử thách đii 💛</div>
+<div class="game-subtitle">giúp Bob tìm đường đến trái tim nè!</div>
+<canvas id="maze-canvas"></canvas>
+<div class="game-controls">
+<button class="ctrl-btn" onclick="movePlayer(0,-1)">▲</button>
+<div class="ctrl-row">
+<button class="ctrl-btn" onclick="movePlayer(-1,0)">◄</button>
+<button class="ctrl-btn" onclick="movePlayer(0,1)">▼</button>
+<button class="ctrl-btn" onclick="movePlayer(1,0)">►</button>
+</div>
+</div>
+<div class="game-hint">dùng phím mũi tên hoặc vuốt màn hình 💛</div>
+<div id="win-overlay">
+<div class="win-text">chúc mừng pun thúi! 🎉</div>
+<div class="win-sub">mở quà thôi nào~</div>
+<div class="win-hearts">💛💗💛💗💛</div>
+</div>
+</div>
+
+<div class="bg-pattern-container">
+<div class="scrolling-text" id="bg-text-source">Pin yêu Pun &nbsp; ❤ &nbsp; Pin yêu Pun &nbsp; ❤ &nbsp;</div>
+<div id="bg-text-container"></div>
+</div>
+
+<div id="intro-screen">
+<div class="vinyl-container" onclick="startExperience()">
+<div class="vinyl-disk">
+<div class="vinyl-cover-art-container">
+<img src="cover.jpeg" class="vinyl-cover-art" alt="Cover">
+</div>
+</div>
+</div>
+<p class="click-hint">bấm vào đi pun</p>
+</div>
+
+<iframe id="youtube-player" allow="autoplay; encrypted-media" style="position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none;z-index:-1;border:none;"></iframe>
+
+<div class="main-wrapper" id="main-wrapper">
+<div class="paper-layer-back"></div>
+<div class="container">
+<div class="washi-tape tape-1"></div>
+<div class="washi-tape tape-2"></div>
+
+<div class="counter-tag" id="counter-tag">
+<div id="quiz-mode">
+<input type="number" id="guess-input" class="quiz-input" placeholder="đoán ngày iu nhau ii">
+<button class="quiz-btn" onclick="checkDays()">OK</button>
+<div id="error-msg" class="error-msg">pun hong iu pin 😡</div>
+</div>
+<div id="result-mode" class="counter-content">
+<small style="font-family: 'Montserrat';">Bên nhau</small>
+<span id="days-count">0</span>
+<small style="font-family: 'Montserrat';">Ngày hạnh phúc</small>
+</div>
+</div>
+
+<div class="header-section">
+<h3>Gửi</h3>
+<h1>pun iu của pin</h1>
+<p style="font-style: italic; font-weight: 500;">valentine đầu tiên của chúng mình 14/2/2026</p>
+<div class="music-player-vintage">
+<button style="background:none;border:none;cursor:pointer;font-size:1.5rem; color:var(--deep-burgundy);" onclick="toggleMusic()" id="playPauseBtn">❚❚</button>
+<span style="font-weight: 600; margin-left: 10px;">🎵</span>
+</div>
+</div>
+
+<div class="heart-grid-container">
+<div class="love-thumb pos-1-2"><img src="IMG_8375.jpeg"></div>
+<div class="love-thumb pos-1-3"><img src="DSCF8637 4.jpeg"></div>
+<div class="love-thumb pos-1-5"><img src="Photo on 28-5-25 at 14.40 %232.jpeg"></div>
+<div class="love-thumb pos-1-6"><img src="IMG_9375.jpeg"></div>
+<div class="love-thumb pos-2-1"><img src="90658252-5689-4F77-8792-424956817E7B.jpeg"></div>
+<div class="love-thumb pos-2-2"><img src="D59CC898-EAF6-4573-87FF-16AEA5A977C9.jpeg"></div>
+<div class="love-thumb pos-2-3"><img src="IMG_8164.jpeg"></div>
+<div class="love-thumb pos-2-4"><img src="att.1p5ZzUaMtE_ShS8OHqtY0ceG5ZgFuAKCU9CL7hOuA1Q.jpeg"></div>
+<div class="love-thumb pos-2-5"><img src="daa8a3b31d7a6ced85028dffb8b2adbc 2.jpeg"></div>
+<div class="love-thumb pos-2-6"><img src="IMG_0279.jpeg"></div>
+<div class="love-thumb pos-2-7"><img src="IMG_0385.jpeg"></div>
+<div class="love-thumb pos-3-1"><img src="IMG_0400.jpeg"></div>
+<div class="love-thumb pos-3-2"><img src="IMG_0683.jpeg"></div>
+<div class="love-thumb pos-3-3"><img src="IMG_0892.jpeg"></div>
+<div class="love-thumb pos-3-4"><img src="IMG_0890.jpeg"></div>
+<div class="love-thumb pos-3-5"><img src="IMG_0897.jpeg"></div>
+<div class="love-thumb pos-3-6"><img src="IMG_0900.jpeg"></div>
+<div class="love-thumb pos-3-7"><img src="Photo on 25-10-25 at 15.28 %233.jpeg"></div>
+<div class="love-thumb pos-4-2"><img src="IMG_8666.jpeg"></div>
+<div class="love-thumb pos-4-3"><img src="IMG_9064.jpeg"></div>
+<div class="love-thumb has-letter pos-4-4" onclick="openLetter(this)" data-letter="nóc nóc helu pun,
+
+bất ngờ hong pun thúiiiii, chắc pun nghĩ pin hong có kịp tặng quà cho pun chứ gìiii💝
+
+dịp vlt đầu tin của chúng mình, mặc dù hong có gì nhiềuuu, nhưng pin mong pun sẽ thích cái web này mà pin làm (gemini giúp).
+
+cúi cùng thì đã có ngày vlt mà pin hong còn cô đơn nữa, và pun cũng vị. iu pun nhứt nhứt nhứt ăn mứt hong ăn .ứt hì hì. nhớ pun nhiều lắm ạ, sắp tới 2 ngày nữa là anni 9 tháng của mình, nhanh nhỉ pun nhỉ. thời gian trôi qua nhanh nhưng pin hong có quên pun nhanh như v (hong có chiện đó đâu!). chúc pun valentine này hạnh phúc, vui vẻ và luôn yêu pin. mong pun sẽ thích món quà nho nhỏ này ạa.
+
+đặc biệt là cùng nhau đi qua nhiều mùa valentine nữa nhaaaaaaaaaaaaa
+pin iu pun nhiều lắmmm💗"><img src="IMG_9185.jpeg"></div>
+<div class="love-thumb pos-4-5"><img src="IMG_1535.jpeg"></div>
+<div class="love-thumb pos-4-6"><img src="51EA0199-3C68-4544-B28B-69FEC94196EC.jpeg"></div>
+<div class="love-thumb pos-5-3"><img src="IMG_8375 (1).jpeg"></div>
+<div class="love-thumb pos-5-4"><img src="EC192763-1436-425B-8857-581C5BAD3DDB.jpeg"></div>
+<div class="love-thumb pos-5-5"><img src="IMG_0727.jpeg"></div>
+<div class="love-thumb pos-6-4"><img src="IMG_0731.jpeg"></div>
+</div>
+
+<div class="audio-section">
+<h3>💌 bấm vào nghe pin nói cái này nè:</h3>
+<audio controls class="local-audio"><source src="voicemail.m4a" type="audio/mp4"></audio>
+</div>
+</div>
+</div>
+
+<div class="secret-locket" onclick="toggleLocket()">❤️</div>
+<div class="locket-message" id="locketMsg">Yêu Pun nhất trên đời!<br>Moazz! 😘</div>
+<div class="letter-modal" id="letterModal">
+<div class="letter-content">
+<span class="close-letter" onclick="closeLetterModal()">&times;</span>
+<div class="letter-text" id="modalText"></div>
+<div style="text-align: right; margin-top: 40px; font-family: 'Cinzel Decorative'; color: var(--deep-burgundy); font-size: 1.5rem;">Love, Pin.</div>
+</div>
+</div>
+
+<script>
+// ===== MINION BOB MAZE GAME =====
+var gameWon = false;
+(function() {
+var ROWS = 7, COLS = 7;
+var GH = ROWS * 2 + 1, GW = COLS * 2 + 1;
+var canvas = document.getElementById('maze-canvas');
+var ctx = canvas.getContext('2d');
+var maxS = Math.min(window.innerWidth - 30, window.innerHeight - 270, 520);
+var CS = Math.floor(maxS / GW);
+if (CS < 24) CS = 24;
+canvas.width = GW * CS;
+canvas.height = GH * CS;
+var maze, pR, pC, gR, gC, frame = 0, animId;
+var decos = [];
+var gameAC = null, gameMelTimer = null;
+function startGameMusic() {
+try { gameAC = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { return; }
+playMelLoop();
+}
+function stopGameMusic() {
+if (gameMelTimer) { clearTimeout(gameMelTimer); gameMelTimer = null; }
+if (gameAC) { try { gameAC.close(); } catch(e) {} gameAC = null; }
+}
+function playMelLoop() {
+if (!gameAC || gameAC.state === 'closed') return;
+var mel = [
+[523,.18],[659,.18],[784,.18],[1047,.3],[0,.05],
+[784,.15],[659,.15],[523,.3],[0,.1],
+[440,.18],[523,.18],[659,.18],[784,.3],[0,.05],
+[659,.15],[523,.15],[440,.3],[0,.1],
+[349,.15],[440,.15],[523,.15],[659,.15],[784,.15],[880,.15],[784,.4],[0,.1],
+[659,.13],[784,.13],[659,.13],[523,.13],[440,.13],[523,.5],[0,.3]
+];
+var mg = gameAC.createGain();
+mg.gain.value = 0.15;
+mg.connect(gameAC.destination);
+var t = gameAC.currentTime + 0.05, dur = 0;
+for (var i = 0; i < mel.length; i++) {
+if (mel[i][0] > 0) {
+var o = gameAC.createOscillator(), g = gameAC.createGain();
+o.connect(g); g.connect(mg);
+o.type = 'triangle'; o.frequency.value = mel[i][0];
+g.gain.setValueAtTime(0.3, t);
+g.gain.exponentialRampToValueAtTime(0.001, t + mel[i][1]*0.9);
+o.start(t); o.stop(t + mel[i][1]);
+}
+t += mel[i][1]; dur += mel[i][1];
+}
+gameMelTimer = setTimeout(playMelLoop, dur * 1000);
+}
+
+function genMaze() {
+maze = [];
+for (var r = 0; r < GH; r++) { maze[r] = []; for (var c = 0; c < GW; c++) maze[r][c] = 0; }
+var vis = [];
+for (var r = 0; r < ROWS; r++) { vis[r] = []; for (var c = 0; c < COLS; c++) vis[r][c] = false; }
+function carve(r, c) {
+vis[r][c] = true;
+maze[r*2+1][c*2+1] = 1;
+var dirs = [[0,1],[0,-1],[1,0],[-1,0]];
+for (var i = dirs.length - 1; i > 0; i--) { var j = Math.floor(Math.random()*(i+1)); var t = dirs[i]; dirs[i] = dirs[j]; dirs[j] = t; }
+for (var i = 0; i < dirs.length; i++) {
+var nr = r+dirs[i][0], nc = c+dirs[i][1];
+if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && !vis[nr][nc]) {
+maze[r*2+1+dirs[i][0]][c*2+1+dirs[i][1]] = 1;
+carve(nr, nc);
+}
+}
+}
+carve(0, 0);
+pR = 1; pC = 1; gR = GH - 2; gC = GW - 2;
+decos = [];
+for (var dr = 0; dr < GH; dr++) {
+for (var dc = 0; dc < GW; dc++) {
+if (maze[dr][dc]===1 && !(dr===1&&dc===1) && !(dr===GH-2&&dc===GW-2)) {
+var rn = Math.random();
+if (rn<0.10) decos.push({t:'flower',r:dr,c:dc,cl:['#FF6B9D','#FF69B4','#FFB347','#DDA0DD','#FF8A65'][Math.floor(Math.random()*5)]});
+else if (rn<0.16) decos.push({t:'tuft',r:dr,c:dc});
+else if (rn<0.19) decos.push({t:'banana',r:dr,c:dc});
+else if (rn<0.22) decos.push({t:'mush',r:dr,c:dc});
+}
+}
+}
+}
+
+function drawMaze() {
+for (var r = 0; r < GH; r++) {
+for (var c = 0; c < GW; c++) {
+var x = c*CS, y = r*CS;
+if (maze[r][c]===0) {
+ctx.fillStyle = '#1a5c1a';
+ctx.fillRect(x, y, CS, CS);
+ctx.fillStyle = '#277a27';
+ctx.fillRect(x+1, y+1, CS-2, CS-2);
+ctx.fillStyle = '#3a9a3a';
+var ls = CS*0.12;
+ctx.beginPath();
+ctx.arc(x+CS*0.25,y+CS*0.3,ls,0,6.28);
+ctx.arc(x+CS*0.7,y+CS*0.55,ls,0,6.28);
+ctx.arc(x+CS*0.45,y+CS*0.78,ls*0.9,0,6.28);
+ctx.arc(x+CS*0.8,y+CS*0.2,ls*0.7,0,6.28);
+ctx.fill();
+} else {
+ctx.fillStyle = '#7ec850';
+ctx.fillRect(x, y, CS, CS);
+ctx.fillStyle = '#8fd660';
+ctx.fillRect(x+1, y+1, CS-2, CS-2);
+}
+}
+}
+for (var i = 0; i < decos.length; i++) {
+var d = decos[i], dx = d.c*CS+CS/2, dy = d.r*CS+CS/2;
+if (d.t==='flower') {
+var fs=CS*0.09;
+ctx.fillStyle=d.cl;
+for (var p=0;p<5;p++){var a=p*1.257;ctx.beginPath();ctx.arc(dx+Math.cos(a)*fs,dy+Math.sin(a)*fs,fs*0.7,0,6.28);ctx.fill();}
+ctx.fillStyle='#FFD700';ctx.beginPath();ctx.arc(dx,dy,fs*0.5,0,6.28);ctx.fill();
+} else if (d.t==='tuft') {
+ctx.strokeStyle='#4a8a30';ctx.lineWidth=1.5;ctx.beginPath();
+ctx.moveTo(dx-3,dy+CS*0.12);ctx.lineTo(dx-1,dy-CS*0.12);
+ctx.moveTo(dx,dy+CS*0.12);ctx.lineTo(dx+1,dy-CS*0.14);
+ctx.moveTo(dx+3,dy+CS*0.12);ctx.lineTo(dx+2,dy-CS*0.11);
+ctx.stroke();
+} else if (d.t==='banana') {
+ctx.save();ctx.translate(dx,dy);ctx.rotate(-0.4);
+ctx.fillStyle='#FFE135';ctx.beginPath();
+ctx.arc(0,0,CS*0.11,0,Math.PI);ctx.arc(0,CS*0.03,CS*0.08,Math.PI,0,true);
+ctx.closePath();ctx.fill();
+ctx.strokeStyle='#D4A017';ctx.lineWidth=0.5;ctx.stroke();
+ctx.restore();
+} else if (d.t==='mush') {
+ctx.fillStyle='#E74C3C';ctx.beginPath();ctx.arc(dx,dy-CS*0.04,CS*0.08,Math.PI,0);ctx.fill();
+ctx.fillStyle='#F5F5DC';ctx.fillRect(dx-CS*0.025,dy-CS*0.04,CS*0.05,CS*0.08);
+ctx.fillStyle='#FFF';ctx.beginPath();ctx.arc(dx-CS*0.03,dy-CS*0.06,CS*0.02,0,6.28);ctx.arc(dx+CS*0.03,dy-CS*0.08,CS*0.015,0,6.28);ctx.fill();
+}
+}
+}
+
+function drawBob(gr, gc) {
+var cx = gc*CS + CS/2, cy = gr*CS + CS/2, s = CS*0.4;
+// body
+ctx.fillStyle = '#FFD93D';
+ctx.beginPath();
+ctx.arc(cx, cy - s*0.3, s*0.65, Math.PI, 0);
+ctx.arc(cx, cy + s*0.3, s*0.65, 0, Math.PI);
+ctx.closePath();
+ctx.fill();
+ctx.strokeStyle = '#D4A017'; ctx.lineWidth = 1; ctx.stroke();
+// overalls
+ctx.fillStyle = '#4169E1';
+ctx.beginPath();
+ctx.arc(cx, cy + s*0.3, s*0.63, 0, Math.PI);
+ctx.closePath();
+ctx.fill();
+// straps
+ctx.strokeStyle = '#4169E1'; ctx.lineWidth = Math.max(2, s*0.1);
+ctx.beginPath();
+ctx.moveTo(cx - s*0.3, cy + s*0.15); ctx.lineTo(cx - s*0.2, cy - s*0.05);
+ctx.moveTo(cx + s*0.3, cy + s*0.15); ctx.lineTo(cx + s*0.2, cy - s*0.05);
+ctx.stroke();
+// goggle band
+ctx.strokeStyle = '#777'; ctx.lineWidth = Math.max(2, s*0.12);
+ctx.beginPath();
+ctx.moveTo(cx - s*0.7, cy - s*0.3); ctx.lineTo(cx + s*0.7, cy - s*0.3);
+ctx.stroke();
+// goggle frame
+ctx.fillStyle = '#B0B0B0';
+ctx.beginPath(); ctx.arc(cx, cy - s*0.3, s*0.4, 0, Math.PI*2); ctx.fill();
+ctx.strokeStyle = '#888'; ctx.lineWidth = Math.max(1, s*0.06); ctx.stroke();
+// eye white
+ctx.fillStyle = '#FFF';
+ctx.beginPath(); ctx.arc(cx, cy - s*0.3, s*0.3, 0, Math.PI*2); ctx.fill();
+// iris
+ctx.fillStyle = '#5D4E37';
+ctx.beginPath(); ctx.arc(cx, cy - s*0.3, s*0.16, 0, Math.PI*2); ctx.fill();
+// pupil
+ctx.fillStyle = '#111';
+ctx.beginPath(); ctx.arc(cx, cy - s*0.3, s*0.08, 0, Math.PI*2); ctx.fill();
+// eye shine
+ctx.fillStyle = '#FFF';
+ctx.beginPath(); ctx.arc(cx + s*0.06, cy - s*0.37, s*0.04, 0, Math.PI*2); ctx.fill();
+// smile
+ctx.strokeStyle = '#444'; ctx.lineWidth = Math.max(1, s*0.05);
+ctx.beginPath(); ctx.arc(cx, cy + s*0.08, s*0.15, 0.2*Math.PI, 0.8*Math.PI); ctx.stroke();
+// hair
+ctx.strokeStyle = '#333'; ctx.lineWidth = Math.max(1, s*0.04);
+ctx.beginPath();
+ctx.moveTo(cx - 1, cy - s*0.95);
+ctx.quadraticCurveTo(cx + s*0.15, cy - s*1.25, cx - s*0.05, cy - s*1.18);
+ctx.moveTo(cx + 1, cy - s*0.95);
+ctx.quadraticCurveTo(cx - s*0.1, cy - s*1.2, cx + s*0.1, cy - s*1.15);
+ctx.stroke();
+}
+
+function drawHeart(gr, gc) {
+var cx = gc*CS + CS/2, cy = gr*CS + CS/2;
+var s = CS * 0.35;
+var p = 1 + Math.sin(frame*0.08)*0.13;
+ctx.save();
+ctx.translate(cx, cy + s*0.1);
+ctx.scale(p, p);
+ctx.fillStyle = '#FF1493';
+ctx.shadowColor = '#FF69B4'; ctx.shadowBlur = 12;
+ctx.beginPath();
+for (var t = 0; t <= 6.3; t += 0.01) {
+var hx = s * 0.8 * 16 * Math.pow(Math.sin(t), 3) / 16;
+var hy = -s * 0.8 * (13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t)) / 16;
+if (t === 0) ctx.moveTo(hx, hy); else ctx.lineTo(hx, hy);
+}
+ctx.closePath();
+ctx.fill();
+ctx.shadowBlur = 0;
+ctx.fillStyle = 'rgba(255,255,255,0.3)';
+ctx.beginPath();
+ctx.arc(-s*0.2, -s*0.3, s*0.1, 0, Math.PI*2);
+ctx.fill();
+ctx.restore();
+}
+
+function render() {
+if (gameWon) return;
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+drawMaze();
+drawHeart(gR, gC);
+drawBob(pR, pC);
+frame++;
+animId = requestAnimationFrame(render);
+}
+
+var gameMusicOn = false;
+window.movePlayer = function(dx, dy) {
+if (gameWon) return;
+if (!gameMusicOn) { gameMusicOn = true; startGameMusic(); }
+var nr = pR + dy, nc = pC + dx;
+if (nr >= 0 && nr < GH && nc >= 0 && nc < GW && maze[nr][nc] === 1) {
+pR = nr; pC = nc;
+if (pR === gR && pC === gC) { gameWon = true; winGame(); }
+}
+};
+
+document.addEventListener('keydown', function(e) {
+if (gameWon) return;
+var gs = document.getElementById('game-screen');
+if (gs.classList.contains('fade-out') || gs.style.display === 'none') return;
+var ok = true;
+switch(e.key) {
+case 'ArrowUp': case 'w': case 'W': movePlayer(0,-1); break;
+case 'ArrowDown': case 's': case 'S': movePlayer(0,1); break;
+case 'ArrowLeft': case 'a': case 'A': movePlayer(-1,0); break;
+case 'ArrowRight': case 'd': case 'D': movePlayer(1,0); break;
+default: ok = false;
+}
+if (ok) e.preventDefault();
+});
+
+var tx, ty;
+canvas.addEventListener('touchstart', function(e) {
+tx = e.touches[0].clientX; ty = e.touches[0].clientY; e.preventDefault();
+}, {passive: false});
+canvas.addEventListener('touchend', function(e) {
+if (tx == null) return;
+var dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+if (Math.max(Math.abs(dx), Math.abs(dy)) < 10) return;
+if (Math.abs(dx) > Math.abs(dy)) movePlayer(dx > 0 ? 1 : -1, 0);
+else movePlayer(0, dy > 0 ? 1 : -1);
+tx = ty = null;
+});
+
+function winGame() {
+stopGameMusic();
+cancelAnimationFrame(animId);
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+drawMaze();
+drawBob(gR, gC);
+var gs = document.getElementById('game-screen');
+var emojis = ['💛','💗','💕','❤️','💖','🌟','✨'];
+for (var i = 0; i < 20; i++) {
+var h = document.createElement('div');
+h.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+h.style.cssText = 'position:absolute;font-size:'+(18+Math.random()*25)+'px;left:'+(Math.random()*100)+'%;bottom:-40px;pointer-events:none;z-index:5;animation:mazeHeartFloat '+(2+Math.random()*2)+'s ease-out forwards;animation-delay:'+(Math.random()*0.8)+'s;';
+gs.appendChild(h);
+}
+setTimeout(function() { document.getElementById('win-overlay').style.display = 'flex'; }, 400);
+setTimeout(function() { gs.classList.add('fade-out'); }, 3500);
+}
+
+var starsCont = document.getElementById('stars-container');
+for (var i = 0; i < 35; i++) {
+var st = document.createElement('div');
+st.className = 'star';
+st.style.left = Math.random()*100+'%';
+st.style.top = Math.random()*100+'%';
+st.style.animationDelay = Math.random()*2+'s';
+st.style.animationDuration = (1.5+Math.random()*2)+'s';
+var sz = 2+Math.random()*2;
+st.style.width = sz+'px'; st.style.height = sz+'px';
+starsCont.appendChild(st);
+}
+
+genMaze();
+render();
+})();
+
+// ===== EXISTING CODE =====
+const sourceText = document.getElementById('bg-text-source');
+const bgContainer = document.getElementById('bg-text-container');
+for (let i = 0; i < 15; i++) bgContainer.appendChild(sourceText.cloneNode(true));
+
+// --- HỆ THỐNG NHẠC (ưu tiên MP3 local, fallback YouTube) ---
+var musicPlayer = null; // Audio object hoặc 'youtube'
+var musicPlaying = false;
+
+function updateMusicUI(playing) {
+var btn = document.getElementById('playPauseBtn');
+if (playing) {
+btn.innerText = "❚❚";
+} else {
+btn.innerText = "▶";
+}
+}
+
+function startMusic() {
+
+var audio = new Audio('music.mp3');
+audio.loop = true;
+audio.volume = 0.8;
+
+var playPromise = audio.play();
+if (playPromise !== undefined) {
+playPromise.then(function() {
+// MP3 local phát được!
+musicPlayer = audio;
+musicPlaying = true;
+updateMusicUI(true);
+console.log('Đang phát nhạc từ file music.mp3');
+}).catch(function() {
+// MP3 không có hoặc lỗi → thử YouTube
+console.log('Không tìm thấy music.mp3, thử YouTube...');
+startYouTube();
+});
+} else {
+startYouTube();
+}
+}
+
+function startYouTube() {
+var iframe = document.getElementById('youtube-player');
+// Tạo src YouTube với autoplay SAU KHI user click (trình duyệt cho phép)
+iframe.src = 'https://www.youtube.com/embed/YdNZ8Yv-dJs?autoplay=1&loop=1&playlist=YdNZ8Yv-dJs&enablejsapi=1&playsinline=1';
+musicPlayer = 'youtube';
+musicPlaying = true;
+updateMusicUI(true);
+console.log('Đang phát nhạc từ YouTube');
+}
+
+function toggleMusic() {
+if (!musicPlayer) {
+startMusic();
+return;
+}
+if (musicPlayer instanceof Audio) {
+if (musicPlaying) {
+musicPlayer.pause();
+musicPlaying = false;
+} else {
+musicPlayer.play();
+musicPlaying = true;
+}
+updateMusicUI(musicPlaying);
+} else if (musicPlayer === 'youtube') {
+var iframe = document.getElementById('youtube-player');
+try {
+if (musicPlaying) {
+iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+musicPlaying = false;
+} else {
+iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+musicPlaying = true;
+}
+updateMusicUI(musicPlaying);
+} catch(e) {
+console.log('Không thể điều khiển YouTube player');
+}
+}
+}
+
+// --- XỬ LÝ CLICK MỞ MÀN ---
+function startExperience() {
+var vinyl = document.querySelector('.vinyl-container');
+var intro = document.getElementById('intro-screen');
+var wrapper = document.getElementById('main-wrapper');
+
+// 1. Xoay đĩa
+vinyl.classList.add('spinning');
+
+// 2. Phát nhạc (được gọi từ click của user → trình duyệt cho phép autoplay)
+startMusic();
+
+// 3. Ẩn intro từ từ
+setTimeout(function() {
+intro.classList.add('fade-out');
+wrapper.style.opacity = "1";
+wrapper.style.transform = "translateY(0) scale(1)";
+}, 2000);
+}
+
+const startDate = new Date("2025-05-16").getTime();
+const now = new Date().getTime();
+const trueDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+function checkDays() {
+const userGuess = document.getElementById('guess-input').value;
+const container = document.getElementById('counter-tag');
+if (parseInt(userGuess) == trueDays) {
+container.style.transform = "rotate(360deg) scale(1.1)";
+document.getElementById('quiz-mode').style.display = 'none';
+document.getElementById('result-mode').style.display = 'block';
+document.getElementById('days-count').innerText = trueDays;
+} else {
+document.getElementById('error-msg').style.display = 'block';
+container.style.animation = "shake 0.5s";
+setTimeout(() => { container.style.animation = "none"; }, 500);
+}
+}
+
+const modal = document.getElementById('letterModal');
+const modalText = document.getElementById('modalText');
+function openLetter(element) {
+modalText.innerText = element.getAttribute('data-letter');
+modal.classList.add('active');
+}
+function closeLetterModal() { modal.classList.remove('active'); }
+modal.addEventListener('click', e => { if (e.target === modal) closeLetterModal(); });
+function toggleLocket() { document.getElementById('locketMsg').classList.toggle('show'); }
+</script>
+</body>
+</html> 
